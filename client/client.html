@@ -1,13 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Our simple HTTP server</title>
   <link rel="stylesheet" type="text/css" href="/style.css">
-  
-  <script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      //Get  elements
+      const sendButton = document.getElementById('send');
+      const pageSelect = document.getElementById('page');
+      const typeSelect = document.getElementById('type');
+      const contentDiv = document.getElementById('content');
+
+
+      //Event listener
+      sendButton.addEventListener('click', async () => {
+        const url = pageSelect.value;
+        const contentType = typeSelect.value;
+
+        try {
+
+          //GET request
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Accept': contentType
+            }
+          });
+
+          const data = await response.text();
+
+          //Print raw data
+          console.log(data);
+
+          //Get currently selected option
+          const selectedOption = pageSelect.options[pageSelect.selectedIndex];
+
+          //Get display text from currently selection option
+          const pageName = selectedOption.text;
+
+          const responseContentType = response.headers.get('Content-Type');
+
+          //JSON
+          if (responseContentType && responseContentType.includes('application/json')) {
+            const jsonData = JSON.parse(data);
+
+            //Display Status and Message
+            contentDiv.innerHTML = `<p><strong>${pageName}</strong>
+              </p><p> ${jsonData.message}</p>`;
+          } else if (responseContentType && responseContentType.includes('text/xml')) {
+
+            //Parse XML to extract message
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data, 'text/xml');
+            const message = xmlDoc.getElementsByTagName('message')[0]?.textContent || 'No message found';
+
+            //Display status and message
+            contentDiv.innerHTML = `<p><strong>${pageName}</strong></p><p> ${message}</p>`;
+          }
+
+          //Error handling
+        } catch (error) {
+          contentDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+        }
+      });
+    });
   </script>
 </head>
+
 <body>
   <section id="top">
     <h3>Status Code Tests</h3>
@@ -29,4 +91,5 @@
   <section id="content">
   </section>
 </body>
+
 </html>
