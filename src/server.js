@@ -20,7 +20,7 @@ const urlStruct = {
 
 
 const onRequest = (request, response) => {
-    
+
     //Parse URL
     const protocol = request.connection.encrypted ? 'https' : 'http';
     const parsedUrl = new URL(request.url, `${protocol}://${request.headers.host}`);
@@ -35,7 +35,7 @@ const onRequest = (request, response) => {
 
     //Check if URL exists
     if (urlStruct[parsedUrl.pathname]) {
-        
+
         //Check if XML is requested
         if (useXML && XMLResponseHandler[parsedUrl.pathname.slice(1)]) {
 
@@ -63,4 +63,4 @@ const onRequest = (request, response) => {
 
 //Create server
 http.createServer(onRequest).listen(port);
-console.log(`Listening on 127.0.0.1: ${port}`)
+console.log(`Listening on 127.0.0.1: ${port}`);

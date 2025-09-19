@@ -13,18 +13,15 @@ const respond = (request, response, content, type) => {
   response.end();
 };
 
-
 //Index of page
 const getIndex = (request, response) => {
   respond(request, response, index, 'text/html');
 };
 
-
 //CSS file
 const getCSS = (request, response) => {
   respond(request, response, css, 'text/css');
 };
-
 
 //Export
 module.exports = {

@@ -23,9 +23,9 @@ const badRequest = (request, response, params) => {
         message: 'This request has the required parameters',
     };
 
-    //If parameter is missing or false, send json with error code
-    if (!params || !params.query || !params.query.valid || params.query.valid !== 'true') {
-        responseJSON.message = 'Missing valid query parameter set to yes';
+    //If parameter is missing or invalid, send json with error code
+    if (params?.query?.valid !== 'true') {
+        responseJSON.message = 'Missing valid query parameter set to true';
         responseJSON.id = 'badRequest';
         return respondJSON(request, response, 400, responseJSON);
     }
@@ -40,9 +40,9 @@ const unauthorized = (request, response, params) => {
         message: 'You have successfully viewed the content.',
     };
 
-    //If parameter is missing or false, send json with 401 code
-    if (!params || !params.query || !params.query.loggedIn || params.query.loggedIn !== 'yes') {
-        
+    //If parameter is missing or invalid, send json with 401 code
+    if (params?.query?.loggedIn !== 'yes') {
+
         //New message and ID
         responseJSON.message = 'Missing loggedIn query parameter set to yes';
         responseJSON.id = 'unauthorized';
