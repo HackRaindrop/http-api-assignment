@@ -1,7 +1,5 @@
 const http = require('http');
 const responseHandler = require('./responses.js');
-const JSONResponseHandler = require('./jsonResponses.js');
-const XMLResponseHandler = require('./xmlResponses.js');
 
 //Set port
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
@@ -9,12 +7,12 @@ const port = process.env.PORT || process.env.NODE_PORT || 3000;
 //URLS
 const urlStruct = {
     '/': responseHandler.getIndex,
-    '/success': JSONResponseHandler.success,
-    '/badRequest': JSONResponseHandler.badRequest,
-    '/unauthorized': JSONResponseHandler.unauthorized,
-    '/forbidden': JSONResponseHandler.forbidden,
-    '/internal': JSONResponseHandler.internal,
-    '/notImplemented': JSONResponseHandler.notImplemented,
+    '/success': responseHandler.success,
+    '/badRequest': responseHandler.badRequest,
+    '/unauthorized': responseHandler.unauthorized,
+    '/forbidden': responseHandler.forbidden,
+    '/internal': responseHandler.internal,
+    '/notImplemented': responseHandler.notImplemented,
     '/style.css': responseHandler.getCSS,
 };
 
@@ -28,36 +26,15 @@ const onRequest = (request, response) => {
         query: Object.fromEntries(parsedUrl.searchParams)
     }
 
-    //Check accept header
-    //Default to JSON
-    const acceptHeader = request.headers.accept || 'application/json';
-    const useXML = acceptHeader.includes('text/xml');
-
     //Check if URL exists
     if (urlStruct[parsedUrl.pathname]) {
 
-        //Check if XML is requested
-        if (useXML && XMLResponseHandler[parsedUrl.pathname.slice(1)]) {
-
-            //Call XML response handler
-            XMLResponseHandler[parsedUrl.pathname.slice(1)](request, response, params);
-        } else {
-
-            //Call JSON response handler
-            urlStruct[parsedUrl.pathname](request, response, params);
-        }
-
-        //URL does not exist
+        //Call response handler (handles both JSON and XML internally)
+        urlStruct[parsedUrl.pathname](request, response, params);
     } else {
-        if (useXML) {
 
-            //Call XML response handler
-            XMLResponseHandler.anythingElse(request, response, params);
-        } else {
-
-            //Call JSON response handler
-            JSONResponseHandler.anythingElse(request, response, params);
-        }
+        //URL does not exist - call not found handler
+        responseHandler.anythingElse(request, response, params);
     }
 };
 
